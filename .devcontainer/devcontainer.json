@@ -1,0 +1,20 @@
+{
+  "name": "Harrastuspassi Web React",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "docker-compose.yml"
+  ],
+  "service": "runserver",
+  "workspaceFolder": "/code",
+  "runServices": [
+    "runserver"
+  ],
+  "shutdownAction": "stopCompose",
+  "extensions": [
+    "donjayamanne.githistory",
+    "eamodio.gitlens",
+    "davidanson.vscode-markdownlint",
+    "dakara.transformer",
+    "esbenp.prettier-vscode"
+  ]
+}

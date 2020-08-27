@@ -324,7 +324,6 @@ const HobbyEditForm = ({ cancelUrl }) => {
             <HobbyEventModalButton handleNewEvent={handleNewEvent} />
           </Grid>
         </Grid>
-        <p>Mikäli haluat luoda toistuvia tapahtumia, ota yhteyttä tukiosoitteeseen harrastuspassi@tuki.haltu.fi</p>
       </Box>
 
       {hobbyEventItems}

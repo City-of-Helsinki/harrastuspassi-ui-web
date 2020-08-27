@@ -1,7 +1,16 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
-import { FormControl, Grid, Button, Box } from '@material-ui/core';
+import {
+  FormControl,
+  Grid,
+  Button,
+  Box,
+  FormGroup,
+  FormControlLabel,
+  Checkbox,
+  TextField
+} from '@material-ui/core';
 import {
   MuiPickersUtilsProvider,
   KeyboardTimePicker,
@@ -156,6 +165,44 @@ const HobbyEventModalButton = ({ handleNewEvent }) => {
                       }
                     />
                   </FormControl>
+                </Grid>
+              </Grid>
+              <Grid>
+                <Grid item>
+                  <FormGroup row>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={hobbyEventData.is_recurrent}
+                          onChange={e => {
+                            setHobbyEventData({
+                              ...hobbyEventData,
+                              is_recurrent: e.target.checked ? 1 : 0
+                            });
+                          }}
+                          name="checkedA"
+                        />
+                      }
+                      label="Toistuu viikoittain"
+                    />
+                    <FormControlLabel
+                      control={
+                        <TextField
+                          value={hobbyEventData.recurrency_count}
+                          onChange={e => {
+                            setHobbyEventData({
+                              ...hobbyEventData,
+                              recurrency_count: Number(e.target.value)
+                            });
+                          }}
+                          type="number"
+                          size="small"
+                          style={{ width: 50 }}
+                        />
+                      }
+                      label="viikon ajan"
+                    />
+                  </FormGroup>
                 </Grid>
               </Grid>
 

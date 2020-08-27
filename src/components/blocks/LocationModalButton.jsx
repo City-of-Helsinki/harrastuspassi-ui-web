@@ -22,11 +22,7 @@ const LocationModalButton = () => {
     name: '',
     address: '',
     zip_code: '',
-    city: '',
-    coordinates: {
-      latitude: 0.0,
-      longitude: 0.0
-    }
+    city: ''
   });
 
   const classes = useStyles();
@@ -38,15 +34,21 @@ const LocationModalButton = () => {
       name: locationData.name,
       address: locationData.address,
       zip_code: locationData.zip_code,
-      city: locationData.city,
-      coordinates: {
+      city: locationData.city
+    };
+    if (
+      locationData.coordinates &&
+      locationData.coordinates.latitude &&
+      locationData.coordinates.longitude
+    ) {
+      locationFormData.coordinates = {
         type: 'Point',
         coordinates: [
           parseFloat(locationData.coordinates.latitude),
           parseFloat(locationData.coordinates.longitude)
         ]
-      }
-    };
+      };
+    }
     dispatch(ActionCreators.createLocation(locationFormData));
     setOpen(false);
   };
@@ -157,6 +159,7 @@ const LocationModalButton = () => {
                 <Grid item>
                   <Button onClick={() => setOpen(false)}>Cancel</Button>
                   <Button
+                    disabled={!locationData.name}
                     variant="contained"
                     color="primary"
                     type="button"

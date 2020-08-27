@@ -10,12 +10,13 @@ Implemented in React, requires Harrastuspassi backend API.
 ## Development
 
 - Run `npm install` to install dependencies
-- Create `.env.local` with the following variables:
-  - `REACT_APP_API_URL=<backend host>/api/<api_version>/`
-  - `REACT_APP_TOKEN_URL=<backend host>/auth/token/`
-  - `REACT_APP_LOGIN_URL=<backend host>/accounts/login/`
 - Run `npm start` to start development server
 - Run `npm test` to execute tests
+- To access the application from browser, first add this row to your local hosts file:
+
+```
+127.0.0.1       harrastuspassiadmin.kehitys.fi
+```
 
 ## Deployment
 

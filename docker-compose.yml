@@ -1,0 +1,37 @@
+---
+version: '3'
+services:
+  runserver:
+    build: .
+    command: bash -c "FORCE_COLOR=true npm start | cat"
+    ports:
+      - '3000:3000'
+      - '80:80'
+    volumes:
+      - .:/code
+      - ./hosts:/etc/hosts
+      - node_modules:/code/node_modules
+      - $SSH_AUTH_SOCK:$SSH_AUTH_SOCK
+    environment:
+      # Project specific env vars for this project:
+      # Service level env vars:
+      - HTTPS=off
+      - LANG=en_US.utf8
+      - LC_ALL=en_US.UTF-8
+      - LC_LANG=en_US.UTF-8
+      # Infra env vars:
+      - SSH_AUTH_SOCK
+      - GIT_AUTHOR_EMAIL
+      - GIT_AUTHOR_NAME
+      - GIT_COMMITTER_EMAIL
+      - GIT_COMMITTER_NAME
+    networks:
+      - network
+    stdin_open: true
+    tty: true
+
+volumes:
+  node_modules:
+
+networks:
+  network:

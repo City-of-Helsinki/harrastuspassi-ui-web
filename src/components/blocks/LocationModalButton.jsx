@@ -157,6 +157,7 @@ const LocationModalButton = () => {
                 <Grid item>
                   <Button onClick={() => setOpen(false)}>Cancel</Button>
                   <Button
+                    disabled={!locationData.name}
                     variant="contained"
                     color="primary"
                     type="button"

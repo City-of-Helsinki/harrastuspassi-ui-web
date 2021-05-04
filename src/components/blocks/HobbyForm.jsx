@@ -162,9 +162,19 @@ const HobbyForm = ({ cancelUrl }) => {
     setHobbyEventData([data, ...hobbyEventData]);
   };
 
+  const constructCategoryName = category => {
+    let displayName = '';
+    for (let index = 0; index < category.level; index += 1) {
+      console.log('lol');
+      displayName += '>';
+    }
+    displayName += ` ${category.name}`;
+    return displayName;
+  };
+
   const categoryListItems = categoryState.categories.map((category, index) => (
     <MenuItem value={category.id} key={index}>
-      {category.name}
+      {constructCategoryName(category)}
     </MenuItem>
   ));
   const locationListItems = locationState.locations.map((location, index) => (

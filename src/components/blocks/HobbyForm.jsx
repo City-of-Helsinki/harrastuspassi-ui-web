@@ -67,15 +67,12 @@ const HobbyForm = ({ cancelUrl }) => {
   const nameValidator = () => {
     let isValid = true;
     if (formState.hobby.name && formState.hobby.name.length > 1024) {
-      console.log(1);
       isValid = false;
     }
     if (!formState.hobby.name) {
-      console.log(2);
       isValid = false;
     }
     if (formState.hobby.name && formState.hobby.name.length < 1) {
-      console.log(3);
       isValid = false;
     }
     return isValid;
@@ -129,21 +126,6 @@ const HobbyForm = ({ cancelUrl }) => {
     return isValid;
   };
   const validateForm = () => {
-    console.log('name', nameValidator());
-    console.log('location', locationValidator());
-    console.log('desc', descriptionValidator());
-    console.log('org', orgnanizerValidator());
-    console.log('price', priceValidator());
-    console.log('category', categoryValidator());
-
-    console.log(
-      nameValidator() &&
-        locationValidator() &&
-        priceValidator() &&
-        categoryValidator() &&
-        descriptionValidator() &&
-        orgnanizerValidator()
-    );
     return (
       nameValidator() &&
       locationValidator() &&
@@ -165,7 +147,6 @@ const HobbyForm = ({ cancelUrl }) => {
   const constructCategoryName = category => {
     let displayName = '';
     for (let index = 0; index < category.level; index += 1) {
-      console.log('lol');
       displayName += '>';
     }
     displayName += ` ${category.name}`;

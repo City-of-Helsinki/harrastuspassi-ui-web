@@ -27,6 +27,16 @@ import HobbyEventItem from './HobbyEventItem';
 import ActionCreators from '../../actions';
 import { useDeepCompareEffect } from '../../hooks';
 
+function sortByName(a, b) {
+  if (a.name < b.name) {
+    return -1;
+  }
+  if (a.name > b.name) {
+    return 1;
+  }
+  return 0;
+}
+
 const HobbyForm = ({ cancelUrl }) => {
   const categoryState = useSelector(state => state.categories);
   const organizerState = useSelector(state => state.organizers);
@@ -158,12 +168,12 @@ const HobbyForm = ({ cancelUrl }) => {
       {constructCategoryName(category)}
     </MenuItem>
   ));
-  const locationListItems = locationState.locations.map((location, index) => (
+  const locationListItems = locationState.locations.sort(sortByName).map((location, index) => (
     <MenuItem value={location.id} key={index}>
       {location.name}
     </MenuItem>
   ));
-  const organizerListItems = organizerState.organizers.map(
+  const organizerListItems = organizerState.organizers.sort(sortByName).map(
     (organizer, index) => (
       <MenuItem value={organizer.id} key={index}>
         {organizer.name}

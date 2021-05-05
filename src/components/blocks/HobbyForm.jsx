@@ -286,7 +286,7 @@ const HobbyForm = ({ cancelUrl }) => {
           </label>
           <p style={{ fontSize: 14 }}>
             Suurin sallittu tiedostokoko: 2 Mt. Kuvan optimaalinen resoluutio on
-            n. 1280x720 px.{' '}
+            n. 1280x720 px.
           </p>
         </FormControl>
       </Box>

@@ -38,7 +38,9 @@ const HobbyEditForm = ({ cancelUrl }) => {
   const locationID = formState.hobby.location;
 
   const [hobbyEventData, setHobbyEventData] = React.useState([]);
-  const [priceValue, setPriceValue] = React.useState(`${formState.hobby.price_type}`);
+  const [priceValue, setPriceValue] = React.useState(
+    `${formState.hobby.price_type}`
+  );
 
   const dispatch = useDispatch();
   const handleChange = event => {
@@ -81,9 +83,90 @@ const HobbyEditForm = ({ cancelUrl }) => {
     setHobbyEventData([data, ...hobbyEventData]);
   };
 
+  const nameValidator = () => {
+    let isValid = true;
+    if (formState.hobby.name && formState.hobby.name.length > 1024) {
+      isValid = false;
+    }
+    if (!formState.hobby.name) {
+      isValid = false;
+    }
+    if (formState.hobby.name && formState.hobby.name.length < 1) {
+      isValid = false;
+    }
+    return isValid;
+  };
+
+  const orgnanizerValidator = () => {
+    let isValid = true;
+    if (!formState.hobby.organizer) {
+      isValid = false;
+    }
+    return isValid;
+  };
+
+  const locationValidator = () => {
+    let isValid = true;
+    if (!formState.hobby.location) {
+      isValid = false;
+    }
+    return isValid;
+  };
+
+  const descriptionValidator = () => {
+    let isValid = true;
+    if (formState.hobby.description && formState.hobby.description.length < 1) {
+      isValid = false;
+    }
+    if (!formState.hobby.description) {
+      isValid = false;
+    }
+    return isValid;
+  };
+
+  const categoryValidator = () => {
+    let isValid = true;
+    if (formState.hobby.categories && formState.hobby.categories.length < 1) {
+      isValid = false;
+    }
+    if (!formState.hobby.categories) {
+      isValid = false;
+    }
+    return isValid;
+  };
+
+  const priceValidator = () => {
+    let isValid = true;
+    if (formState.hobby.price_type && formState.hobby.price_type !== 'free') {
+      if (!formState.hobby.price_amount) {
+        isValid = false;
+      }
+    }
+    return isValid;
+  };
+  const validateForm = () => {
+    return (
+      nameValidator() &&
+      locationValidator() &&
+      priceValidator() &&
+      categoryValidator() &&
+      descriptionValidator() &&
+      orgnanizerValidator()
+    );
+  };
+
+  const constructCategoryName = category => {
+    let displayName = '';
+    for (let index = 0; index < category.level; index += 1) {
+      displayName += '>';
+    }
+    displayName += ` ${category.name}`;
+    return displayName;
+  };
+
   const categoryListItems = categoryState.categories.map((category, index) => (
     <MenuItem value={category.id} key={index}>
-      {category.name}
+      {constructCategoryName(category)}
     </MenuItem>
   ));
   const locationListItems = locationState.locations.map((location, index) => (
@@ -181,9 +264,10 @@ const HobbyEditForm = ({ cancelUrl }) => {
 
       <Box mt={4} style={{ display: 'inline-flex' }} width={1}>
         <div style={{ width: '100%' }}>
-          <FormControl fullWidth>
+          <FormControl fullWidth required>
             <InputLabel>Vaihda sijainti</InputLabel>
             <Select
+              required
               id="location"
               name="location"
               value={locationID || ''}
@@ -220,7 +304,10 @@ const HobbyEditForm = ({ cancelUrl }) => {
               <p>{formState.hobby.cover_image ? 'Kuva valittu' : 'Ei kuvaa'}</p>
             </div>
           </label>
-          <p style={{ fontSize: 14}}>Suurin sallittu tiedostokoko: 2 Mt. Kuvan optimaalinen resoluutio on n. 1280x720 px. </p>
+          <p style={{ fontSize: 14 }}>
+            Suurin sallittu tiedostokoko: 2 Mt. Kuvan optimaalinen resoluutio on
+            n. 1280x720 px.{' '}
+          </p>
         </FormControl>
       </Box>
 
@@ -234,15 +321,17 @@ const HobbyEditForm = ({ cancelUrl }) => {
             margin="dense"
             variant="outlined"
             onChange={handleChange}
+            required
           />
         </FormControl>
       </Box>
 
       <Box mt={4} style={{ display: 'inline-flex' }} width={1}>
         <div style={{ width: '100%' }}>
-          <FormControl fullWidth>
+          <FormControl fullWidth required>
             <InputLabel>Vaihda järjestäjä</InputLabel>
             <Select
+              required
               id="organizer"
               name="organizer"
               value={formState.hobby.organizer || ''}
@@ -256,10 +345,11 @@ const HobbyEditForm = ({ cancelUrl }) => {
       </Box>
 
       <Box mt={4}>
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <InputLabel htmlFor="select-multiple-chip">Kategoriat</InputLabel>
           <Select
             multiple
+            required
             name="categories"
             value={formState.hobby.categories || []}
             onChange={handleChange}
@@ -274,7 +364,8 @@ const HobbyEditForm = ({ cancelUrl }) => {
                   <Chip
                     key={value}
                     label={
-                      (categoryState.categories.find(o => o.id === value) || {}).name
+                      (categoryState.categories.find(o => o.id === value) || {})
+                        .name
                     }
                   />
                 ))}
@@ -289,11 +380,31 @@ const HobbyEditForm = ({ cancelUrl }) => {
         <div style={{ width: '100%' }}>
           <FormControl fullWidth>
             <FormLabel component="legend">Vaihda hinnan tyyppi</FormLabel>
-            <RadioGroup name='price_type' value={formState.hobby.price_type || 'undefined'} onChange={handleChange}>
-              <FormControlLabel value='free' control={<Radio />} label='Ilmainen' />
-              <FormControlLabel value='annual' control={<Radio />} label='Vuosimaksu' />
-              <FormControlLabel value='seasonal' control={<Radio />} label='Kausimaksu' />
-              <FormControlLabel value='one_time' control={<Radio />} label='Kertamaksu' />
+            <RadioGroup
+              name="price_type"
+              value={formState.hobby.price_type || 'undefined'}
+              onChange={handleChange}
+            >
+              <FormControlLabel
+                value="free"
+                control={<Radio />}
+                label="Ilmainen"
+              />
+              <FormControlLabel
+                value="annual"
+                control={<Radio />}
+                label="Vuosimaksu"
+              />
+              <FormControlLabel
+                value="seasonal"
+                control={<Radio />}
+                label="Kausimaksu"
+              />
+              <FormControlLabel
+                value="one_time"
+                control={<Radio />}
+                label="Kertamaksu"
+              />
             </RadioGroup>
           </FormControl>
         </div>
@@ -329,12 +440,22 @@ const HobbyEditForm = ({ cancelUrl }) => {
       {hobbyEventItems}
 
       <Box mt={3} mb={3}>
+        {!validateForm() && (
+          <p style={{ color: 'red' }}>
+            Tähdellä merkityt kentät ovat pakollisia!
+          </p>
+        )}
         <Grid container justify="flex-end">
           <Grid item>
             <Button component={Link} to={cancelUrl}>
               Peruuta
             </Button>
-            <Button variant="contained" color="primary" type="submit">
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              disabled={!validateForm()}
+            >
               Tallenna
             </Button>
           </Grid>

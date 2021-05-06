@@ -4,16 +4,20 @@ import { withRouter } from 'react-router-dom';
 import { Typography, Container } from '@material-ui/core';
 import HobbyForm from '../blocks/HobbyForm';
 import ActionCreators from '../../actions';
-import { useDeepCompareEffect } from '../../hooks';
+import { useDeepCompareEffect, useSelector } from '../../hooks';
 
 const HobbyCreateView = () => {
   const dispatch = useDispatch();
+  const authState = useSelector(state => state.auth);
+
   useDeepCompareEffect(() => {
-    // initial data fetch
-    dispatch(ActionCreators.fetchCategories());
-    dispatch(ActionCreators.fetchOrganizers());
-    dispatch(ActionCreators.fetchLocations());
-  }, []);
+    if (authState.accessToken) {
+      // initial data fetch
+      dispatch(ActionCreators.fetchCategories());
+      dispatch(ActionCreators.fetchOrganizers());
+      dispatch(ActionCreators.fetchLocations());
+    }
+  }, [authState.accessToken]);
 
   return (
     <Container maxWidth="sm">

@@ -27,6 +27,16 @@ import HobbyEventItem from './HobbyEventItem';
 import ActionCreators from '../../actions';
 import { useDeepCompareEffect } from '../../hooks';
 
+function sortByName(a, b) {
+  if (a.name < b.name) {
+    return -1;
+  }
+  if (a.name > b.name) {
+    return 1;
+  }
+  return 0;
+}
+
 const HobbyForm = ({ cancelUrl }) => {
   const categoryState = useSelector(state => state.categories);
   const organizerState = useSelector(state => state.organizers);
@@ -64,10 +74,77 @@ const HobbyForm = ({ cancelUrl }) => {
     }
   };
 
-  const validateForm = () => {
-    //TODO
+  const nameValidator = () => {
+    let isValid = true;
+    if (formState.hobby.name && formState.hobby.name.length > 1024) {
+      isValid = false;
+    }
+    if (!formState.hobby.name) {
+      isValid = false;
+    }
+    if (formState.hobby.name && formState.hobby.name.length < 1) {
+      isValid = false;
+    }
+    return isValid;
   };
 
+  const orgnanizerValidator = () => {
+    let isValid = true;
+    if (!formState.hobby.organizer) {
+      isValid = false;
+    }
+    return isValid;
+  };
+
+  const locationValidator = () => {
+    let isValid = true;
+    if (!formState.hobby.location) {
+      isValid = false;
+    }
+    return isValid;
+  };
+
+  const descriptionValidator = () => {
+    let isValid = true;
+    if (formState.hobby.description && formState.hobby.description.length < 1) {
+      isValid = false;
+    }
+    if (!formState.hobby.description) {
+      isValid = false;
+    }
+    return isValid;
+  };
+
+  const categoryValidator = () => {
+    let isValid = true;
+    if (formState.hobby.categories && formState.hobby.categories.length < 1) {
+      isValid = false;
+    }
+    if (!formState.hobby.categories) {
+      isValid = false;
+    }
+    return isValid;
+  };
+
+  const priceValidator = () => {
+    let isValid = true;
+    if (formState.hobby.price_type && formState.hobby.price_type !== 'free') {
+      if (!formState.hobby.price_amount) {
+        isValid = false;
+      }
+    }
+    return isValid;
+  };
+  const validateForm = () => {
+    return (
+      nameValidator() &&
+      locationValidator() &&
+      priceValidator() &&
+      categoryValidator() &&
+      descriptionValidator() &&
+      orgnanizerValidator()
+    );
+  };
   const handleRemoveEvent = id => {
     const filteredEvents = formState.hobbyEvents.filter(item => item.id !== id);
     dispatch(ActionCreators.removeHobbyEvent(filteredEvents));
@@ -77,17 +154,26 @@ const HobbyForm = ({ cancelUrl }) => {
     setHobbyEventData([data, ...hobbyEventData]);
   };
 
+  const constructCategoryName = category => {
+    let displayName = '';
+    for (let index = 0; index < category.level; index += 1) {
+      displayName += '>';
+    }
+    displayName += ` ${category.name}`;
+    return displayName;
+  };
+
   const categoryListItems = categoryState.categories.map((category, index) => (
     <MenuItem value={category.id} key={index}>
-      {category.name}
+      {constructCategoryName(category)}
     </MenuItem>
   ));
-  const locationListItems = locationState.locations.map((location, index) => (
+  const locationListItems = locationState.locations.sort(sortByName).map((location, index) => (
     <MenuItem value={location.id} key={index}>
       {location.name}
     </MenuItem>
   ));
-  const organizerListItems = organizerState.organizers.map(
+  const organizerListItems = organizerState.organizers.sort(sortByName).map(
     (organizer, index) => (
       <MenuItem value={organizer.id} key={index}>
         {organizer.name}
@@ -168,12 +254,13 @@ const HobbyForm = ({ cancelUrl }) => {
 
       <Box mt={4} style={{ display: 'inline-flex' }} width={1}>
         <div style={{ width: '100%' }}>
-          <FormControl fullWidth>
+          <FormControl fullWidth required>
             <InputLabel>Sijainti</InputLabel>
             <Select
               id="location"
+              required
               name="location"
-              value={formState.hobby.location || ''}
+              value={formState.hobby.location || null}
               onChange={handleChange}
             >
               {locationListItems}
@@ -207,7 +294,10 @@ const HobbyForm = ({ cancelUrl }) => {
               <p>{formState.hobby.cover_image ? 'Kuva valittu' : 'Ei kuvaa'}</p>
             </div>
           </label>
-          <p style={{ fontSize: 14}}>Suurin sallittu tiedostokoko: 2 Mt. Kuvan optimaalinen resoluutio on n. 1280x720 px. </p>
+          <p style={{ fontSize: 14 }}>
+            Suurin sallittu tiedostokoko: 2 Mt. Kuvan optimaalinen resoluutio on
+            n. 1280x720 px.
+          </p>
         </FormControl>
       </Box>
 
@@ -216,9 +306,10 @@ const HobbyForm = ({ cancelUrl }) => {
           <TextField
             id="description"
             name="description"
-            label="Kuvaus *"
+            label="Kuvaus"
             margin="dense"
             variant="outlined"
+            required
             onChange={handleChange}
           />
         </FormControl>
@@ -226,9 +317,10 @@ const HobbyForm = ({ cancelUrl }) => {
 
       <Box mt={4} style={{ display: 'inline-flex' }} width={1}>
         <div style={{ width: '100%' }}>
-          <FormControl fullWidth>
+          <FormControl fullWidth required>
             <InputLabel>Järjestäjä</InputLabel>
             <Select
+              required
               id="organizer"
               name="organizer"
               value={formState.hobby.organizer || ''}
@@ -242,10 +334,11 @@ const HobbyForm = ({ cancelUrl }) => {
       </Box>
 
       <Box mt={4}>
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <InputLabel htmlFor="select-multiple-chip">Kategoriat</InputLabel>
           <Select
             multiple
+            required
             name="categories"
             value={formState.hobby.categories || []}
             onChange={handleChange}
@@ -277,11 +370,31 @@ const HobbyForm = ({ cancelUrl }) => {
         <div style={{ width: '100%' }}>
           <FormControl fullWidth>
             <FormLabel component="legend">Hinnan tyyppi</FormLabel>
-            <RadioGroup name='price_type' value={priceValue} onChange={handleChange}>
-              <FormControlLabel value='free' control={<Radio />} label='Ilmainen' />
-              <FormControlLabel value='annual' control={<Radio />} label='Vuosimaksu' />
-              <FormControlLabel value='seasonal' control={<Radio />} label='Kausimaksu' />
-              <FormControlLabel value='one_time' control={<Radio />} label='Kertamaksu' />
+            <RadioGroup
+              name="price_type"
+              value={priceValue}
+              onChange={handleChange}
+            >
+              <FormControlLabel
+                value="free"
+                control={<Radio />}
+                label="Ilmainen"
+              />
+              <FormControlLabel
+                value="annual"
+                control={<Radio />}
+                label="Vuosimaksu"
+              />
+              <FormControlLabel
+                value="seasonal"
+                control={<Radio />}
+                label="Kausimaksu"
+              />
+              <FormControlLabel
+                value="one_time"
+                control={<Radio />}
+                label="Kertamaksu"
+              />
             </RadioGroup>
           </FormControl>
         </div>
@@ -293,7 +406,7 @@ const HobbyForm = ({ cancelUrl }) => {
               <TextField
                 id="price_amount"
                 name="price_amount"
-                label="Hinta"
+                label="Hinta *"
                 margin="dense"
                 variant="outlined"
                 onChange={handleChange}
@@ -311,18 +424,35 @@ const HobbyForm = ({ cancelUrl }) => {
             <HobbyEventModalButton handleNewEvent={handleNewEvent} />
           </Grid>
         </Grid>
-        <p>Mikäli haluat luoda toistuvia tapahtumia, ota yhteyttä tukiosoitteeseen harrastuspassi@tuki.haltu.fi</p>
+        <p>
+          Mikäli haluat luoda toistuvia tapahtumia, ota yhteyttä
+          tukiosoitteeseen harrastuspassi@tuki.haltu.fi
+        </p>
       </Box>
 
       {hobbyEventItems}
 
       <Box mt={10} mb={3}>
+        {!validateForm() && (
+          <p style={{ color: 'red' }}>
+            Tähdellä merkityt kentät ovat pakollisia!
+          </p>
+        )}
         <Grid container justify="flex-end">
           <Grid item>
-            <Button component={Link} to={cancelUrl} className={classes.cancelButton}>
+            <Button
+              component={Link}
+              to={cancelUrl}
+              className={classes.cancelButton}
+            >
               Peruuta
             </Button>
-            <Button variant="contained" color="primary" type="submit">
+            <Button
+              variant="contained"
+              color="primary"
+              type="submit"
+              disabled={!validateForm()}
+            >
               Tallenna
             </Button>
           </Grid>
